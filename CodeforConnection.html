@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VibeSync - Sync your mood, find your Tribe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Mental Health Theme */
+      --mental-bg: #FFF8E7;
+      --mental-bg-gradient: linear-gradient(135deg, #FFF3B0 0%, #FFE5A0 50%, #FFF8E7 100%);
+      --mental-primary: #FFB347;
+      --mental-accent: #FF9500;
+      --mental-card: #FFFFFF;
+      --mental-text: #5D4E37;
+      --mental-muted: #8B7355;
+     
+      /* Interest Theme */
+      --interest-bg: #E8FDF5;
+      --interest-bg-gradient: linear-gradient(135deg, #A8E6CF 0%, #7DD3B0 50%, #E8FDF5 100%);
+      --interest-primary: #2EC4B6;
+      --interest-accent: #20A4A4;
+      --interest-card: #FFFFFF;
+      --interest-text: #1A5F4A;
+      --interest-muted: #3D8B75;
+     
+      /* General */
+      --bg: #FAFAFA;
+      --fg: #1A1A2E;
+      --muted: #6B7280;
+      --card: #FFFFFF;
+      --border: #E5E7EB;
+      --accent: #FF6B35;
+      --accent-hover: #E85A2A;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
+    }
+
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .font-display {
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    /* Animated Background */
+    .bg-animated {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .bg-blob-1 {
+      width: 400px;
+      height: 400px;
+      background: #FFB347;
+      top: -100px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+
+    .bg-blob-2 {
+      width: 300px;
+      height: 300px;
+      background: #2EC4B6;
+      bottom: -50px;
+      left: -50px;
+      animation-delay: -5s;
+    }
+
+    .bg-blob-3 {
+      width: 200px;
+      height: 200px;
+      background: #A8E6CF;
+      top: 50%;
+      left: 50%;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.1); }
+      50% { transform: translate(-20px, 20px) scale(0.9); }
+      75% { transform: translate(20px, 30px) scale(1.05); }
+    }
+
+    /* Page Transitions */
+    .page {
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .page.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      outline: none;
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-mental {
+      background: var(--mental-primary);
+      color: var(--mental-text);
+    }
+
+    .btn-mental:hover {
+      background: var(--mental-accent);
+      transform: translateY(-2px);
+    }
+
+    .btn-interest {
+      background: var(--interest-primary);
+      color: white;
+    }
+
+    .btn-interest:hover {
+      background: var(--interest-accent);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--border);
+      color: var(--fg);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Input Fields */
+    .input-field {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+    }
+
+    .input-field::placeholder {
+      color: var(--muted);
+    }
+
+    /* Mood Cards */
+    .mood-card {
+      padding: 20px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+      background: white;
+    }
+
+    .mood-card:hover {
+      transform: scale(1.05);
+    }
+
+    .mood-card.selected {
+      border-color: var(--mental-accent);
+      background: var(--mental-bg);
+    }
+
+    /* Interest Tags */
+    .interest-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+      border: 2px solid var(--border);
+      color: var(--fg);
+    }
+
+    .interest-tag:hover {
+      border-color: var(--interest-primary);
+    }
+
+    .interest-tag.selected {
+      background: var(--interest-primary);
+      border-color: var(--interest-primary);
+      color: white;
+    }
+
+    /* Profile Picture */
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+      box-shadow: var(--shadow);
+    }
+
+    .avatar-lg {
+      width: 80px;
+      height: 80px;
+    }
+
+    .avatar-sm {
+      width: 36px;
+      height: 36px;
+    }
+
+    /* Navbar */
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Chat */
+    .chat-bubble {
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .chat-bubble.sent {
+      background: var(--accent);
+      color: white;
+      border-bottom-right-radius: 4px;
+      margin-left: auto;
+    }
+
+    .chat-bubble.received {
+      background: #F3F4F6;
+      color: var(--fg);
+      border-bottom-left-radius: 4px;
+    }
+
+    /* Notification Badge */
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 20px;
+      height: 20px;
+      background: #EF4444;
+      color: white;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .animate-slide-in {
+      animation: slideIn 0.4s ease forwards;
+    }
+
+    .stagger-1 { animation-delay: 0.1s; opacity: 0; }
+    .stagger-2 { animation-delay: 0.2s; opacity: 0; }
+    .stagger-3 { animation-delay: 0.3s; opacity: 0; }
+    .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+    .stagger-5 { animation-delay: 0.5s; opacity: 0; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #D1D5DB;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9CA3AF;
+    }
+
+    /* Mental Theme Page */
+    .theme-mental {
+      --page-bg: var(--mental-bg-gradient);
+    }
+
+    /* Interest Theme Page */
+    .theme-interest {
+      --page-bg: var(--interest-bg-gradient);
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 16px 24px;
+      background: var(--fg);
+      color: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 400px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-animated">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+    <div class="bg-blob bg-blob-3"></div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Landing Page -->
+  <div id="page-landing" class="page active">
+    <div class="min-h-screen flex flex-col">
+      <!-- Header -->
+      <header class="p-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-teal-400 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </div>
+          <span class="font-display text-2xl font-bold">VibeSync</span>
+        </div>
+        <button onclick="navigateTo('login')" class="btn btn-outline">Sign In</button>
+      </header>
+
+      <!-- Hero -->
+      <main class="flex-1 flex items-center justify-center px-6">
+        <div class="max-w-4xl text-center">
+          <h1 class="font-display text-5xl md:text-7xl font-bold mb-6 leading-tight animate-fade-in-up">
+            Sync your mood,<br>
+            <span class="bg-gradient-to-r from-orange-500 to-teal-500 bg-clip-text text-transparent">find your Tribe</span>
+          </h1>
+          <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto animate-fade-in-up stagger-1">
+            Connect with like-minded people based on your current feelings and shared interests. Build meaningful connections in a supportive community.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up stagger-2">
+            <button onclick="navigateTo('register')" class="btn btn-primary text-lg px-8 py-4">
+              Get Started
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+              </svg>
+            </button>
+            <button onclick="navigateTo('login')" class="btn btn-outline text-lg px-8 py-4">I have an account</button>
+          </div>
+
+          <!-- Features -->
+          <div class="grid md:grid-cols-3 gap-6 mt-20">
+            <div class="card p-6 text-left animate-fade-in-up stagger-3">
+              <div class="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">Mental Wellness</h3>
+              <p class="text-gray-600 text-sm">Connect with people who understand what you're going through. Share your feelings in a safe space.</p>
+            </div>
+            <div class="card p-6 text-left animate-fade-in-up stagger-4">
+              <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">Shared Interests</h3>
+              <p class="text-gray-600 text-sm">Find your tribe based on hobbies and passions. From coding to cricket, there's someone waiting to connect.</p>
+            </div>
+            <div class="card p-6 text-left animate-fade-in-up stagger-5">
+              <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">Private Chats</h3>
+              <p class="text-gray-600 text-sm">Once connected, enjoy private conversations. Your chats stay between you and your connections.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Register Page -->
+  <div id="page-register" class="page">
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+      <div class="card p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+          <h1 class="font-display text-3xl font-bold mb-2">Create Account</h1>
+          <p class="text-gray-600">Join the VibeSync community</p>
+        </div>
+
+        <form id="register-form" class="space-y-5">
+          <!-- Profile Picture Upload -->
+          <div class="flex flex-col items-center mb-6">
+            <div class="relative">
+              <img id="preview-pic" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" alt="Profile" class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg">
+              <label for="profile-pic" class="absolute bottom-0 right-0 w-8 h-8 bg-accent rounded-full flex items-center justify-center cursor-pointer hover:bg-orange-600 transition-colors" style="background: var(--accent);">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              </label>
+              <input type="file" id="profile-pic" accept="image/*" class="hidden" onchange="previewImage(event)">
+            </div>
+            <p class="text-sm text-gray-500 mt-2">Upload profile picture (optional)</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Full Name</label>
+            <input type="text" id="reg-name" class="input-field" placeholder="Enter your full name" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Student ID</label>
+            <input type="text" id="reg-student-id" class="input-field" placeholder="e.g., AB12345678901" required pattern="[A-Z]{2}[0-9]{11}">
+            <p class="text-xs text-gray-500 mt-1">Format: 2 uppercase letters + 11 digits</p>
+            <p id="student-id-error" class="text-xs text-red-500 mt-1 hidden">Invalid Student ID format</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Password</label>
+            <input type="password" id="reg-password" class="input-field" placeholder="Min 6 characters" required minlength="6">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Confirm Password</label>
+            <input type="password" id="reg-confirm-password" class="input-field" placeholder="Confirm your password" required>
+            <p id="password-error" class="text-xs text-red-500 mt-1 hidden">Passwords do not match</p>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-full py-4 text-base">Create Account</button>
+        </form>
+
+        <p class="text-center text-gray-600 mt-6">
+          Already have an account?
+          <a href="#" onclick="navigateTo('login')" class="text-orange-500 font-medium hover:underline">Sign In</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Page -->
+  <div id="page-login" class="page">
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+      <div class="card p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+          <h1 class="font-display text-3xl font-bold mb-2">Welcome Back</h1>
+          <p class="text-gray-600">Sign in to continue to VibeSync</p>
+        </div>
+
+        <form id="login-form" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium mb-2">Student ID</label>
+            <input type="text" id="login-student-id" class="input-field" placeholder="Enter your Student ID" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Password</label>
+            <input type="password" id="login-password" class="input-field" placeholder="Enter your password" required>
+          </div>
+
+          <p id="login-error" class="text-sm text-red-500 hidden">Invalid credentials</p>
+
+          <button type="submit" class="btn btn-primary w-full py-4 text-base">Sign In</button>
+        </form>
+
+        <p class="text-center text-gray-600 mt-6">
+          Don't have an account?
+          <a href="#" onclick="navigateTo('register')" class="text-orange-500 font-medium hover:underline">Create Account</a>
+        </p>
+
+        <div class="mt-8 pt-6 border-t border-gray-200">
+          <p class="text-sm text-gray-500 text-center mb-4">Test Accounts (click to auto-fill)</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="autoFillLogin('AB12345678901', 'password')" class="text-xs px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">User 1 (Happy)</button>
+            <button onclick="autoFillLogin('CD23456789012', 'password')" class="text-xs px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">User 2 (Happy)</button>
+            <button onclick="autoFillLogin('EF34567890123', 'password')" class="text-xs px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">User 3 (Stressed)</button>
+            <button onclick="autoFillLogin('GH45678901234', 'password')" class="text-xs px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">User 4 (Lonely)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="page-dashboard" class="page">
+    <div class="min-h-screen flex flex-col">
+      <!-- Top Navbar -->
+      <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4">
+          <div class="flex items-center justify-between h-16">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-400 to-teal-400 flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+              </div>
+              <span class="font-display text-xl font-bold hidden sm:block">VibeSync</span>
+            </div>
+
+            <div class="flex items-center gap-1 sm:gap-2">
+              <button onclick="showSection('mental')" class="nav-item" data-section="mental">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+                <span class="hidden sm:block">Mental</span>
+              </button>
+              <button onclick="showSection('interests')" class="nav-item" data-section="interests">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <span class="hidden sm:block">Interests</span>
+              </button>
+              <button onclick="showSection('notifications')" class="nav-item relative" data-section="notifications">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span class="hidden sm:block">Alerts</span>
+                <span id="notification-badge" class="badge hidden">0</span>
+              </button>
+              <button onclick="showSection('profile')" class="nav-item" data-section="profile">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                <span class="hidden sm:block">Profile</span>
+              </button>
+              <button onclick="logout()" class="nav-item text-red-500 hover:text-red-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                <span class="hidden sm:block">Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Dashboard Content -->
+      <main class="flex-1 overflow-y-auto">
+        <!-- Mental Section -->
+        <div id="section-mental" class="section hidden" style="background: var(--mental-bg-gradient);">
+          <div class="max-w-6xl mx-auto px-4 py-8">
+            <!-- Mood Selection -->
+            <div id="mental-mood-select" class="mb-8">
+              <h2 class="font-display text-3xl font-bold text-center mb-2" style="color: var(--mental-text);">How are you feeling today?</h2>
+              <p class="text-center mb-8" style="color: var(--mental-muted);">Select your current mood to find others who understand</p>
+             
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-3xl mx-auto">
+                <button onclick="selectMood('Happy')" class="mood-card text-center" data-mood="Happy">
+                  <div class="text-4xl mb-2">😊</div>
+                  <div class="font-semibold" style="color: var(--mental-text);">Happy</div>
+                </button>
+                <button onclick="selectMood('Neutral')" class="mood-card text-center" data-mood="Neutral">
+                  <div class="text-4xl mb-2">😐</div>
+                  <div class="font-semibold" style="color: var(--mental-text);">Neutral</div>
+                </button>
+                <button onclick="selectMood('Stressed')" class="mood-card text-center" data-mood="Stressed">
+                  <div class="text-4xl mb-2">😰</div>
+                  <div class="font-semibold" style="color: var(--mental-text);">Stressed</div>
+                </button>
+                <button onclick="selectMood('Lonely')" class="mood-card text-center" data-mood="Lonely">
+                  <div class="text-4xl mb-2">😢</div>
+                  <div class="font-semibold" style="color: var(--mental-text);">Lonely</div>
+                </button>
+                <button onclick="selectMood('Overwhelmed')" class="mood-card text-center" data-mood="Overwhelmed">
+                  <div class="text-4xl mb-2">😵</div>
+                  <div class="font-semibold" style="color: var(--mental-text);">Overwhelmed</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Mental Suggestions -->
+            <div id="mental-suggestions" class="hidden">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="font-display text-2xl font-bold" style="color: var(--mental-text);">People who feel the same</h3>
+                <button onclick="resetMood()" class="btn btn-outline text-sm py-2 px-4">Change Mood</button>
+              </div>
+              <div id="mental-users-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- Mental Connections -->
+            <div id="mental-connections" class="mt-12">
+              <h3 class="font-display text-2xl font-bold mb-6" style="color: var(--mental-text);">Your Mental Health Connections</h3>
+              <div id="mental-connections-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+              <p id="no-mental-connections" class="text-center py-8" style="color: var(--mental-muted);">No connections yet. Select your mood to find people!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interests Section -->
+        <div id="section-interests" class="section hidden" style="background: var(--interest-bg-gradient);">
+          <div class="max-w-6xl mx-auto px-4 py-8">
+            <!-- Interest Selection -->
+            <div id="interest-select" class="mb-8">
+              <h2 class="font-display text-3xl font-bold text-center mb-2" style="color: var(--interest-text);">What are you interested in?</h2>
+              <p class="text-center mb-8" style="color: var(--interest-muted);">Select your interests to find like-minded people</p>
+             
+              <div class="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto mb-6">
+                <button onclick="toggleInterest('Cricket')" class="interest-tag" data-interest="Cricket">Cricket</button>
+                <button onclick="toggleInterest('Shuttle')" class="interest-tag" data-interest="Shuttle">Shuttle</button>
+                <button onclick="toggleInterest('Coding')" class="interest-tag" data-interest="Coding">Coding</button>
+                <button onclick="toggleInterest('Movies')" class="interest-tag" data-interest="Movies">Movies</button>
+                <button onclick="toggleInterest('Music')" class="interest-tag" data-interest="Music">Music</button>
+                <button onclick="toggleInterest('Gaming')" class="interest-tag" data-interest="Gaming">Gaming</button>
+                <button onclick="toggleInterest('Reading')" class="interest-tag" data-interest="Reading">Reading</button>
+                <button onclick="toggleInterest('Art')" class="interest-tag" data-interest="Art">Art</button>
+              </div>
+              <div class="text-center">
+                <button onclick="saveInterests()" class="btn btn-interest">Save Interests</button>
+              </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="max-w-md mx-auto mb-8">
+              <div class="relative">
+                <input type="text" id="search-users" class="input-field pl-12" placeholder="Search by name..." oninput="searchUsers()">
+                <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Interest Suggestions -->
+            <div id="interest-suggestions">
+              <h3 class="font-display text-2xl font-bold mb-6" style="color: var(--interest-text);">People with shared interests</h3>
+              <div id="interest-users-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- Interest Connections -->
+            <div id="interest-connections" class="mt-12">
+              <h3 class="font-display text-2xl font-bold mb-6" style="color: var(--interest-text);">Your Interest Connections</h3>
+              <div id="interest-connections-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+              <p id="no-interest-connections" class="text-center py-8" style="color: var(--interest-muted);">No connections yet. Select your interests to find people!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications Section -->
+        <div id="section-notifications" class="section hidden">
+          <div class="max-w-4xl mx-auto px-4 py-8">
+            <h2 class="font-display text-3xl font-bold mb-8">Notifications</h2>
+           
+            <!-- Pending Requests -->
+            <div class="mb-8">
+              <h3 class="text-xl font-semibold mb-4">Pending Requests</h3>
+              <div id="pending-requests" class="space-y-3"></div>
+              <p id="no-pending" class="text-gray-500 text-center py-8 hidden">No pending requests</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="section-profile" class="section hidden">
+          <div class="max-w-2xl mx-auto px-4 py-8">
+            <div class="card p-8">
+              <div class="text-center mb-8">
+                <img id="profile-avatar" src="" alt="Profile" class="avatar avatar-lg mx-auto mb-4">
+                <h2 id="profile-name" class="font-display text-2xl font-bold"></h2>
+                <p id="profile-student-id" class="text-gray-500"></p>
+              </div>
+
+              <div class="space-y-6">
+                <div>
+                  <label class="block text-sm font-medium mb-2">Bio</label>
+                  <textarea id="profile-bio" class="input-field" rows="3" placeholder="Write something about yourself..."></textarea>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-2">Your Interests</label>
+                  <div id="profile-interests" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-2">Current Mood</label>
+                  <p id="profile-mood" class="text-lg"></p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="text-center p-4 bg-yellow-50 rounded-xl">
+                    <div id="mental-connections-count" class="text-2xl font-bold text-yellow-600">0</div>
+                    <div class="text-sm text-gray-600">Mental Connections</div>
+                  </div>
+                  <div class="text-center p-4 bg-green-50 rounded-xl">
+                    <div id="interest-connections-count" class="text-2xl font-bold text-green-600">0</div>
+                    <div class="text-sm text-gray-600">Interest Connections</div>
+                  </div>
+                </div>
+
+                <button onclick="saveProfile()" class="btn btn-primary w-full">Save Changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div id="profile-modal" class="modal-overlay" onclick="closeProfileModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="text-center">
+        <img id="modal-avatar" src="" alt="Profile" class="avatar avatar-lg mx-auto mb-4">
+        <h3 id="modal-name" class="font-display text-2xl font-bold mb-1"></h3>
+        <p id="modal-bio" class="text-gray-600 mb-4"></p>
+        <div id="modal-interests" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+        <div class="flex gap-3 justify-center">
+          <button id="modal-connect-btn" onclick="connectFromModal()" class="btn btn-interest">Connect</button>
+          <button onclick="closeProfileModal()" class="btn btn-outline">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Modal -->
+  <div id="chat-modal" class="modal-overlay" onclick="closeChatModal(event)">
+    <div class="modal-content" style="max-width: 500px; height: 600px; display: flex; flex-direction: column;" onclick="event.stopPropagation()">
+      <div class="flex items-center gap-3 pb-4 border-b">
+        <img id="chat-avatar" src="" alt="User" class="avatar">
+        <div class="flex-1">
+          <h4 id="chat-name" class="font-semibold"></h4>
+          <p id="chat-section" class="text-sm text-gray-500"></p>
+        </div>
+        <button onclick="closeChatModal()" class="p-2 hover:bg-gray-100 rounded-full">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+     
+      <div id="chat-messages" class="flex-1 overflow-y-auto py-4 space-y-3"></div>
+     
+      <div class="pt-4 border-t">
+        <div class="flex gap-2">
+          <input type="text" id="chat-input" class="input-field flex-1" placeholder="Type a message..." onkeypress="if(event.key==='Enter')sendMessage()">
+          <button onclick="sendMessage()" class="btn btn-primary px-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===================== DATA INITIALIZATION =====================
+    const STORAGE_KEY = 'vibesync_data';
+   
+    // Default users for testing
+    const defaultUsers = [
+      { id: 'u1', name: 'Alex Chen', studentId: 'AB12345678901', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex', createdAt: Date.now() - 100000, mood: 'Happy', interests: ['Coding', 'Gaming'], bio: 'Computer science enthusiast who loves coding and gaming!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u2', name: 'Bella Smith', studentId: 'CD23456789012', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bella', createdAt: Date.now() - 90000, mood: 'Happy', interests: ['Cricket', 'Music'], bio: 'Sports lover and music enthusiast!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u3', name: 'Charlie Davis', studentId: 'EF34567890123', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie', createdAt: Date.now() - 80000, mood: 'Stressed', interests: ['Coding', 'Reading'], bio: 'Stressed but hopeful CS student.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u4', name: 'Diana Lee', studentId: 'GH45678901234', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Diana', createdAt: Date.now() - 70000, mood: 'Lonely', interests: ['Music', 'Art'], bio: 'Finding comfort in music and art.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u5', name: 'Ethan Brown', studentId: 'IJ56789012345', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ethan', createdAt: Date.now() - 60000, mood: 'Neutral', interests: ['Shuttle', 'Movies'], bio: 'Just going with the flow!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      // Additional users for more suggestions
+      { id: 'u6', name: 'Fiona Wilson', studentId: 'KL67890123456', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Fiona', createdAt: Date.now() - 50000, mood: 'Happy', interests: ['Art', 'Reading', 'Music'], bio: 'Art teacher who loves reading!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u7', name: 'George Taylor', studentId: 'MN78901234567', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=George', createdAt: Date.now() - 40000, mood: 'Stressed', interests: ['Coding', 'Gaming'], bio: 'Need a break from all this stress!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u8', name: 'Hannah Martinez', studentId: 'OP89012345678', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hannah', createdAt: Date.now() - 30000, mood: 'Lonely', interests: ['Movies', 'Reading'], bio: 'Movie buff looking for friends!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u9', name: 'Ivan Rodriguez', studentId: 'QR90123456789', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ivan', createdAt: Date.now() - 20000, mood: 'Overwhelmed', interests: ['Cricket', 'Shuttle'], bio: 'Sports help me cope!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u10', name: 'Julia Anderson', studentId: 'ST01234567890', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Julia', createdAt: Date.now() - 10000, mood: 'Happy', interests: ['Music', 'Art'], bio: 'Spreading positivity through art!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u11', name: 'Kevin Thomas', studentId: 'UV12345678901', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin', createdAt: Date.now() - 5000, mood: 'Neutral', interests: ['Coding', 'Movies'], bio: 'Dev by day, movie buff by night.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u12', name: 'Luna Garcia', studentId: 'WX23456789012', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna', createdAt: Date.now() - 4000, mood: 'Stressed', interests: ['Reading', 'Music'], bio: 'Music helps me de-stress.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u13', name: 'Mike Johnson', studentId: 'YZ34567890123', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike', createdAt: Date.now() - 3000, mood: 'Happy', interests: ['Shuttle', 'Gaming'], bio: 'Competitive gamer and shuttle player!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u14', name: 'Nina Patel', studentId: 'AB45678901234', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nina', createdAt: Date.now() - 2000, mood: 'Lonely', interests: ['Art', 'Movies'], bio: 'Finding solace in creativity.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u15', name: 'Oscar White', studentId: 'CD56789012345', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Oscar', createdAt: Date.now() - 1000, mood: 'Overwhelmed', interests: ['Coding', 'Reading'], bio: 'Too many projects, too little time!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u16', name: 'Penny Kim', studentId: 'EF67890123456', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Penny', createdAt: Date.now() - 500, mood: 'Happy', interests: ['Cricket', 'Music'], bio: 'Living life to the fullest!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u17', name: 'Quinn Adams', studentId: 'GH78901234567', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Quinn', createdAt: Date.now() - 400, mood: 'Neutral', interests: ['Gaming', 'Movies'], bio: 'Casual gamer and movie enthusiast.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u18', name: 'Rachel Scott', studentId: 'IJ89012345678', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rachel', createdAt: Date.now() - 300, mood: 'Stressed', interests: ['Shuttle', 'Art'], bio: 'Art is my escape from stress.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u19', name: 'Sam Turner', studentId: 'KL90123456789', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam', createdAt: Date.now() - 200, mood: 'Lonely', interests: ['Reading', 'Coding'], bio: 'Books and code are my best friends.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u20', name: 'Tina Hill', studentId: 'MN01234567890', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tina', createdAt: Date.now() - 100, mood: 'Happy', interests: ['Music', 'Shuttle'], bio: 'Happy vibes only!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u21', name: 'Uma Verma', studentId: 'OP12345678901', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Uma', createdAt: Date.now() - 50, mood: 'Overwhelmed', interests: ['Coding', 'Art'], bio: 'Trying to find balance.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u22', name: 'Victor Roy', studentId: 'QR23456789012', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Victor', createdAt: Date.now() - 25, mood: 'Neutral', interests: ['Cricket', 'Gaming'], bio: 'Just another day in paradise.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u23', name: 'Wendy Clark', studentId: 'ST34567890123', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Wendy', createdAt: Date.now() - 10, mood: 'Happy', interests: ['Movies', 'Reading'], bio: 'Stories are my passion!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u24', name: 'Xavier Dias', studentId: 'UV45678901234', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Xavier', createdAt: Date.now() - 5, mood: 'Stressed', interests: ['Music', 'Gaming'], bio: 'Gaming helps me relax.', connectionsMental: [], connectionsInterest: [], pendingRequests: [] },
+      { id: 'u25', name: 'Yara Singh', studentId: 'WX56789012345', password: 'password', profilePic: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Yara', createdAt: Date.now(), mood: 'Lonely', interests: ['Shuttle', 'Coding'], bio: 'Looking for connections!', connectionsMental: [], connectionsInterest: [], pendingRequests: [] }
+    ];
+
+    // Initialize data
+    let appData = loadData();
+    let currentUser = null;
+    let selectedMood = null;
+    let selectedInterests = [];
+    let currentChatUser = null;
+    let currentChatSection = null;
+    let modalUserId = null;
+    let messagePollInterval = null;
+
+    function loadData() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+      const initialData = {
+        users: defaultUsers,
+        requests: [],
+        messages: []
+      };
+      saveData(initialData);
+      return initialData;
+    }
+
+    function saveData(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // ===================== NAVIGATION =====================
+    function navigateTo(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const targetPage = document.getElementById('page-' + page);
+      if (targetPage) {
+        targetPage.classList.add('active');
+      }
+    }
+
+    function showSection(section) {
+      document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+     
+      const targetSection = document.getElementById('section-' + section);
+      if (targetSection) {
+        targetSection.classList.remove('hidden');
+      }
+     
+      const navItem = document.querySelector(`[data-section="${section}"]`);
+      if (navItem) {
+        navItem.classList.add('active');
+      }
+
+      if (section === 'mental') {
+        loadMentalSection();
+      } else if (section === 'interests') {
+        loadInterestSection();
+      } else if (section === 'notifications') {
+        loadNotifications();
+      } else if (section === 'profile') {
+        loadProfile();
+      }
+    }
+
+    // ===================== AUTHENTICATION =====================
+    function previewImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('preview-pic').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+     
+      const name = document.getElementById('reg-name').value.trim();
+      const studentId = document.getElementById('reg-student-id').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirmPassword = document.getElementById('reg-confirm-password').value;
+      const profilePic = document.getElementById('preview-pic').src;
+     
+      // Validate student ID
+      const studentIdRegex = /^[A-Z]{2}[0-9]{11}$/;
+      if (!studentIdRegex.test(studentId)) {
+        document.getElementById('student-id-error').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('student-id-error').classList.add('hidden');
+     
+      // Check password match
+      if (password !== confirmPassword) {
+        document.getElementById('password-error').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('password-error').classList.add('hidden');
+     
+      // Check if student ID already exists
+      if (appData.users.find(u => u.studentId === studentId)) {
+        showToast('Student ID already registered');
+        return;
+      }
+     
+      // Create new user
+      const newUser = {
+        id: 'u' + Date.now(),
+        name,
+        studentId,
+        password,
+        profilePic: profilePic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
+        createdAt: Date.now(),
+        mood: null,
+        interests: [],
+        bio: '',
+        connectionsMental: [],
+        connectionsInterest: [],
+        pendingRequests: []
+      };
+     
+      appData.users.push(newUser);
+      saveData(appData);
+     
+      showToast('Account created successfully!');
+      navigateTo('login');
+    });
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+     
+      const studentId = document.getElementById('login-student-id').value.trim();
+      const password = document.getElementById('login-password').value;
+     
+      const user = appData.users.find(u => u.studentId === studentId && u.password === password);
+     
+      if (user) {
+        currentUser = user;
+        localStorage.setItem('vibesync_current_user', JSON.stringify(currentUser));
+        showToast('Welcome back, ' + user.name + '!');
+        navigateTo('dashboard');
+        showSection('mental');
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+      }
+    });
+
+    function autoFillLogin(studentId, password) {
+      document.getElementById('login-student-id').value = studentId;
+      document.getElementById('login-password').value = password;
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem('vibesync_current_user');
+      if (messagePollInterval) {
+        clearInterval(messagePollInterval);
+      }
+      navigateTo('landing');
+    }
+
+    // ===================== MENTAL SECTION =====================
+    function loadMentalSection() {
+      if (!currentUser) return;
+     
+      // Refresh user data
+      currentUser = appData.users.find(u => u.id === currentUser.id);
+     
+      if (currentUser.mood) {
+        selectedMood = currentUser.mood;
+        document.getElementById('mental-mood-select').classList.add('hidden');
+        document.getElementById('mental-suggestions').classList.remove('hidden');
+        highlightSelectedMood();
+        loadMentalSuggestions();
+      } else {
+        document.getElementById('mental-mood-select').classList.remove('hidden');
+        document.getElementById('mental-suggestions').classList.add('hidden');
+      }
+     
+      loadMentalConnections();
+    }
+
+    function selectMood(mood) {
+      selectedMood = mood;
+      currentUser.mood = mood;
+      const userIndex = appData.users.findIndex(u => u.id === currentUser.id);
+      appData.users[userIndex] = currentUser;
+      saveData(appData);
+     
+      highlightSelectedMood();
+     
+      setTimeout(() => {
+        document.getElementById('mental-mood-select').classList.add('hidden');
+        document.getElementById('mental-suggestions').classList.remove('hidden');
+        loadMentalSuggestions();
+      }, 300);
+    }
+
+    function highlightSelectedMood() {
+      document.querySelectorAll('.mood-card').forEach(card => {
+        if (card.dataset.mood === selectedMood) {
+          card.classList.add('selected');
+        } else {
+          card.classList.remove('selected');
+        }
+      });
+    }
+
+    function resetMood() {
+      selectedMood = null;
+      currentUser.mood = null;
+      const userIndex = appData.users.findIndex(u => u.id === currentUser.id);
+      appData.users[userIndex] = currentUser;
+      saveData(appData);
+     
+      document.getElementById('mental-mood-select').classList.remove('hidden');
+      document.getElementById('mental-suggestions').classList.add('hidden');
+    }
+
+    function loadMentalSuggestions() {
+      const grid = document.getElementById('mental-users-grid');
+      grid.innerHTML = '';
+     
+      // Find users with same mood, not connected, not pending
+      const suggestions = appData.users.filter(u => {
+        if (u.id === currentUser.id) return false;
+        if (u.mood !== selectedMood) return false;
+        if (currentUser.connectionsMental.includes(u.id)) return false;
+        if (hasPendingRequest(currentUser.id, u.id, 'mental')) return false;
+        return true;
+      }).slice(0, 8);
+     
+      suggestions.forEach((user, index) => {
+        const card = createMentalUserCard(user, index);
+        grid.appendChild(card);
+      });
+     
+      if (suggestions.length === 0) {
+        grid.innerHTML = '<p class="col-span-full text-center py-8" style="color: var(--mental-muted);">No users found with this mood. Check back later!</p>';
+      }
+    }
+
+    function createMentalUserCard(user, index) {
+      const card = document.createElement('div');
+      card.className = 'card p-4 animate-fade-in-up';
+      card.style.animationDelay = `${index * 0.1}s`;
+      card.innerHTML = `
+        <div class="flex items-center gap-4">
+          <img src="${user.profilePic}" alt="${user.name}" class="avatar">
+          <div class="flex-1 min-w-0">
+            <h4 class="font-semibold truncate">${user.name}</h4>
+            <p class="text-sm" style="color: var(--mental-muted);">Feeling ${user.mood}</p>
+          </div>
+        </div>
+        <button onclick="sendRequest('${user.id}', 'mental')" class="btn btn-mental w-full mt-4">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+          Connect
+        </button>
+      `;
+      return card;
+    }
+
+    function loadMentalConnections() {
+      const grid = document.getElementById('mental-connections-grid');
+      const noConnections = document.getElementById('no-mental-connections');
+      grid.innerHTML = '';
+     
+      if (!currentUser.connectionsMental || currentUser.connectionsMental.length === 0) {
+        noConnections.classList.remove('hidden');
+        return;
+      }
+     
+      noConnections.classList.add('hidden');
+     
+      currentUser.connectionsMental.forEach(userId => {
+        const user = appData.users.find(u => u.id === userId);
+        if (user) {
+          const card = createConnectionCard(user, 'mental');
+          grid.appendChild(card);
+        }
+      });
+    }
+
+    function createConnectionCard(user, section) {
+      const card = document.createElement('div');
+      card.className = 'card p-4';
+      const btnClass = section === 'mental' ? 'btn-mental' : 'btn-interest';
+      const color = section === 'mental' ? 'var(--mental-primary)' : 'var(--interest-primary)';
+     
+      card.innerHTML = `
+        <div class="flex items-center gap-4">
+          <img src="${user.profilePic}" alt="${user.name}" class="avatar">
+          <div class="flex-1 min-w-0">
+            <h4 class="font-semibold truncate">${user.name}</h4>
+            <p class="text-sm text-gray-500">${section === 'mental' ? 'Mental Health' : 'Interests'} Connection</p>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button onclick="openChat('${user.id}', '${section}')" class="btn ${btnClass} flex-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            Chat
+          </button>
+          <button onclick="removeConnection('${user.id}', '${section}')" class="btn btn-outline px-3" title="Remove connection">
+            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      `;
+      return card;
+    }
+
+    // ===================== INTEREST SECTION =====================
+    function loadInterestSection() {
+      if (!currentUser) return;
+     
+      // Refresh user data
+      currentUser = appData.users.find(u => u.id === currentUser.id);
+     
+      // Highlight existing interests
+      document.querySelectorAll('.interest-tag').forEach(tag => {
+        if (currentUser.interests && currentUser.interests.includes(tag.dataset.interest)) {
+          tag.classList.add('selected');
+          if (!selectedInterests.includes(tag.dataset.interest)) {
+            selectedInterests.push(tag.dataset.interest);
+          }
+        }
+      });
+     
+      loadInterestSuggestions();
+      loadInterestConnections();
+    }
+
+    function toggleInterest(interest) {
+      const tag = document.querySelector(`[data-interest="${interest}"]`);
+     
+      if (selectedInterests.includes(interest)) {
+        selectedInterests = selectedInterests.filter(i => i !== interest);
+        tag.classList.remove('selected');
+      } else {
+        selectedInterests.push(interest);
+        tag.classList.add('selected');
+      }
+    }
+
+    function saveInterests() {
+      currentUser.interests = [...selectedInterests];
+      const userIndex = appData.users.findIndex(u => u.id === currentUser.id);
+      appData.users[userIndex] = currentUser;
+      saveData(appData);
+      showToast('Interests saved!');
+      loadInterestSuggestions();
+    }
+
+    function searchUsers() {
+      const query = document.getElementById('search-users').value.toLowerCase();
+      loadInterestSuggestions(query);
+    }
+
+    function loadInterestSuggestions(searchQuery) {
+      const grid = document.getElementById('interest-users-grid');
+      grid.innerHTML = '';
+     
+      // Find users with shared interests
+      let suggestions = appData.users.filter(u => {
+        if (u.id === currentUser.id) return false;
+        if (!u.interests || u.interests.length === 0) return false;
+        if (!currentUser.interests || currentUser.interests.length === 0) return false;
+       
+        const sharedInterests = u.interests.filter(i => currentUser.interests.includes(i));
+        if (sharedInterests.length === 0) return false;
+       
+        if (currentUser.connectionsInterest.includes(u.id)) return false;
+        if (hasPendingRequest(currentUser.id, u.id, 'interest')) return false;
+       
+        if (searchQuery && !u.name.toLowerCase().includes(searchQuery)) return false;
+       
+        return true;
+      });
+     
+      // Sort by number of shared interests
+      suggestions.sort((a, b) => {
+        const aShared = a.interests.filter(i => currentUser.interests.includes(i)).length;
+        const bShared = b.interests.filter(i => currentUser.interests.includes(i)).length;
+        return bShared - aShared;
+      });
+     
+      suggestions = suggestions.slice(0, 8);
+     
+      suggestions.forEach((user, index) => {
+        const card = createInterestUserCard(user, index);
+        grid.appendChild(card);
+      });
+     
+      if (suggestions.length === 0) {
+        grid.innerHTML = '<p class="col-span-full text-center py-8" style="color: var(--interest-muted);">No users found. Select more interests or check back later!</p>';
+      }
+    }
+
+    function createInterestUserCard(user, index) {
+      const sharedInterests = user.interests.filter(i => currentUser.interests.includes(i));
+      const card = document.createElement('div');
+      card.className = 'card p-4 animate-fade-in-up';
+      card.style.animationDelay = `${index * 0.1}s`;
+     
+      card.innerHTML = `
+        <div class="flex items-center gap-4">
+          <img src="${user.profilePic}" alt="${user.name}" class="avatar">
+          <div class="flex-1 min-w-0">
+            <h4 class="font-semibold truncate">${user.name}</h4>
+            <div class="flex flex-wrap gap-1 mt-1">
+              ${sharedInterests.map(i => `<span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">${i}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button onclick="viewProfile('${user.id}')" class="btn btn-outline flex-1 text-sm py-2">View Profile</button>
+          <button onclick="sendRequest('${user.id}', 'interest')" class="btn btn-interest flex-1 text-sm py-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+            Connect
+          </button>
+        </div>
+      `;
+      return card;
+    }
+
+    function loadInterestConnections() {
+      const grid = document.getElementById('interest-connections-grid');
+      const noConnections = document.getElementById('no-interest-connections');
+      grid.innerHTML = '';
+     
+      if (!currentUser.connectionsInterest || currentUser.connectionsInterest.length === 0) {
+        noConnections.classList.remove('hidden');
+        return;
+      }
+     
+      noConnections.classList.add('hidden');
+     
+      currentUser.connectionsInterest.forEach(userId => {
+        const user = appData.users.find(u => u.id === userId);
+        if (user) {
+          const card = createConnectionCard(user, 'interest');
+          grid.appendChild(card);
+        }
+      });
+    }
+
+    function viewProfile(userId) {
+      const user = appData.users.find(u => u.id === userId);
+      if (!user) return;
+     
+      modalUserId = userId;
+     
+      document.getElementById('modal-avatar').src = user.profilePic;
+      document.getElementById('modal-name').textContent = user.name;
+      document.getElementById('modal-bio').textContent = user.bio || 'No bio yet';
+     
+      const interestsDiv = document.getElementById('modal-interests');
+      interestsDiv.innerHTML = user.interests.map(i =>
+        `<span class="text-sm px-3 py-1 rounded-full" style="background: var(--interest-primary); color: white;">${i}</span>`
+      ).join('');
+     
+      // Check if already connected or pending
+      const connectBtn = document.getElementById('modal-connect-btn');
+      if (currentUser.connectionsInterest.includes(userId)) {
+        connectBtn.textContent = 'Already Connected';
+        connectBtn.disabled = true;
+      } else if (hasPendingRequest(currentUser.id, userId, 'interest')) {
+        connectBtn.textContent = 'Request Pending';
+        connectBtn.disabled = true;
+      } else {
+        connectBtn.textContent = 'Connect';
+        connectBtn.disabled = false;
+      }
+     
+      document.getElementById('profile-modal').classList.add('active');
+    }
+
+    function closeProfileModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      document.getElementById('profile-modal').classList.remove('active');
+    }
+
+    function connectFromModal() {
+      if (modalUserId) {
+        sendRequest(modalUserId, 'interest');
+        closeProfileModal();
+      }
+    }
+
+    // ===================== NOTIFICATIONS =====================
+    function loadNotifications() {
+      if (!currentUser) return;
+     
+      // Refresh user data
+      currentUser = appData.users.find(u => u.id === currentUser.id);
+     
+      const container = document.getElementById('pending-requests');
+      const noPending = document.getElementById('no-pending');
+      container.innerHTML = '';
+     
+      const pendingRequests = appData.requests.filter(r =>
+        r.toUserId === currentUser.id && r.status === 'pending'
+      );
+     
+      if (pendingRequests.length === 0) {
+        noPending.classList.remove('hidden');
+        container.classList.add('hidden');
+      } else {
+        noPending.classList.add('hidden');
+        container.classList.remove('hidden');
+       
+        pendingRequests.forEach(request => {
+          const sender = appData.users.find(u => u.id === request.fromUserId);
+          if (sender) {
+            const card = createRequestCard(request, sender);
+            container.appendChild(card);
+          }
+        });
+      }
+     
+      // Update notification badge
+      updateNotificationBadge();
+    }
+
+    function createRequestCard(request, sender) {
+      const card = document.createElement('div');
+      card.className = 'card p-4 animate-slide-in';
+     
+      const sectionLabel = request.section === 'mental' ? 'Mental Health' : 'Interests';
+      const btnClass = request.section === 'mental' ? 'btn-mental' : 'btn-interest';
+     
+      card.innerHTML = `
+        <div class="flex items-center gap-4">
+          <img src="${sender.profilePic}" alt="${sender.name}" class="avatar">
+          <div class="flex-1">
+            <h4 class="font-semibold">${sender.name}</h4>
+            <p class="text-sm text-gray-500">Wants to connect in ${sectionLabel}</p>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button onclick="acceptRequest('${request.id}')" class="btn ${btnClass} flex-1">Accept</button>
+          <button onclick="rejectRequest('${request.id}')" class="btn btn-outline flex-1">Reject</button>
+        </div>
+      `;
+      return card;
+    }
+
+    function updateNotificationBadge() {
+      const badge = document.getElementById('notification-badge');
+      const pendingCount = appData.requests.filter(r =>
+        r.toUserId === currentUser.id && r.status === 'pending'
+      ).length;
+     
+      if (pendingCount > 0) {
+        badge.textContent = pendingCount > 9 ? '9+' : pendingCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    // ===================== REQUESTS & CONNECTIONS =====================
+    function sendRequest(toUserId, section) {
+      // Check if request already exists
+      const existingRequest = appData.requests.find(r =>
+        r.fromUserId === currentUser.id &&
+        r.toUserId === toUserId &&
+        r.section === section
+      );
+     
+      if (existingRequest) {
+        showToast('Request already sent!');
+        return;
+      }
+     
+      const request = {
+        id: 'r' + Date.now(),
+        fromUserId: currentUser.id,
+        toUserId: toUserId,
+        section: section,
+        status: 'pending',
+        createdAt: Date.now()
+      };
+     
+      appData.requests.push(request);
+      saveData(appData);
+     
+      showToast('Connection request sent!');
+     
+      // Refresh suggestions
+      if (section === 'mental') {
+        loadMentalSuggestions();
+      } else {
+        loadInterestSuggestions();
+      }
+    }
+
+    function hasPendingRequest(fromUserId, toUserId, section) {
+      return appData.requests.some(r =>
+        r.fromUserId === fromUserId &&
+        r.toUserId === toUserId &&
+        r.section === section &&
+        r.status === 'pending'
+      );
+    }
+
+    function acceptRequest(requestId) {
+      const request = appData.requests.find(r => r.id === requestId);
+      if (!request) return;
+     
+      // Update request status
+      request.status = 'accepted';
+     
+      // Add to connections for both users
+      const fromUser = appData.users.find(u => u.id === request.fromUserId);
+      const toUser = appData.users.find(u => u.id === request.toUserId);
+     
+      if (request.section === 'mental') {
+        if (!fromUser.connectionsMental) fromUser.connectionsMental = [];
+        if (!toUser.connectionsMental) toUser.connectionsMental = [];
+        fromUser.connectionsMental.push(toUser.id);
+        toUser.connectionsMental.push(fromUser.id);
+      } else {
+        if (!fromUser.connectionsInterest) fromUser.connectionsInterest = [];
+        if (!toUser.connectionsInterest) toUser.connectionsInterest = [];
+        fromUser.connectionsInterest.push(toUser.id);
+        toUser.connectionsInterest.push(fromUser.id);
+      }
+     
+      saveData(appData);
+     
+      // Refresh current user
+      currentUser = appData.users.find(u => u.id === currentUser.id);
+     
+      showToast('Connection accepted!');
+      loadNotifications();
+    }
+
+    function rejectRequest(requestId) {
+      const requestIndex = appData.requests.findIndex(r => r.id === requestId);
+      if (requestIndex > -1) {
+        appData.requests.splice(requestIndex, 1);
+        saveData(appData);
+      }
+     
+      showToast('Request rejected');
+      loadNotifications();
+    }
+
+    function removeConnection(userId, section) {
+      if (!confirm('Are you sure you want to remove this connection? Chat history will be lost.')) return;
+     
+      // Remove from current user's connections
+      const currentUserIndex = appData.users.findIndex(u => u.id === currentUser.id);
+      if (section === 'mental') {
+        appData.users[currentUserIndex].connectionsMental = appData.users[currentUserIndex].connectionsMental.filter(id => id !== userId);
+      } else {
+        appData.users[currentUserIndex].connectionsInterest = appData.users[currentUserIndex].connectionsInterest.filter(id => id !== userId);
+      }
+     
+      // Remove from other user's connections
+      const otherUserIndex = appData.users.findIndex(u => u.id === userId);
+      if (otherUserIndex > -1) {
+        if (section === 'mental') {
+          appData.users[otherUserIndex].connectionsMental = appData.users[otherUserIndex].connectionsMental.filter(id => id !== currentUser.id);
+        } else {
+          appData.users[otherUserIndex].connectionsInterest = appData.users[otherUserIndex].connectionsInterest.filter(id => id !== currentUser.id);
+        }
+      }
+     
+      // Remove related messages
+      appData.messages = appData.messages.filter(m =>
+        !((m.senderId === currentUser.id && m.receiverId === userId && m.section === section) ||
+          (m.senderId === userId && m.receiverId === currentUser.id && m.section === section))
+      );
+     
+      saveData(appData);
+     
+      // Refresh current user
+      currentUser = appData.users.find(u => u.id === currentUser.id);
+     
+      showToast('Connection removed');
+     
+      if (section === 'mental') {
+        loadMentalConnections();
+        loadMentalSuggestions();
+      } else {
+        loadInterestConnections();
+        loadInterestSuggestions();
+      }
+    }
+
+    // ===================== CHAT SYSTEM =====================
+    function openChat(userId, section) {
+      currentChatUser = appData.users.find(u => u.id === userId);
+      currentChatSection = section;
+     
+      if (!currentChatUser) return;
+     
+      document.getElementById('chat-avatar').src = currentChatUser.profilePic;
+      document.getElementById('chat-name').textContent = currentChatUser.name;
+      document.getElementById('chat-section').textContent = section === 'mental' ? 'Mental Health Chat' : 'Interest Chat';
+     
+      document.getElementById('chat-modal').classList.add('active');
+     
+      loadMessages();
+     
+      // Start polling for new messages
+      if (messagePollInterval) clearInterval(messagePollInterval);
+      messagePollInterval = setInterval(loadMessages, 2000);
+    }
+
+    function closeChatModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      document.getElementById('chat-modal').classList.remove('active');
+      if (messagePollInterval) {
+        clearInterval(messagePollInterval);
+        messagePollInterval = null;
+      }
+      currentChatUser = null;
+      currentChatSection = null;
+    }
+
+    function loadMessages() {
+      if (!currentChatUser || !currentChatSection) return;
+     
+      const messagesDiv = document.getElementById('chat-messages');
+      const existingMessages = messagesDiv.innerHTML;
+     
+      const messages = appData.messages.filter(m =>
+        (m.senderId === currentUser.id && m.receiverId === currentChatUser.id && m.section === currentChatSection) ||
+        (m.senderId === currentChatUser.id && m.receiverId === currentUser.id && m.section === currentChatSection)
+      ).sort((a, b) => a.timestamp - b.timestamp);
+     
+      // Only update if messages changed
+      const messagesHtml = messages.map(m => `
+        <div class="chat-bubble ${m.senderId === currentUser.id ? 'sent' : 'received'}">
+          ${escapeHtml(m.message)}
+          <div class="text-xs opacity-70 mt-1">${formatTime(m.timestamp)}</div>
+        </div>
+      `).join('');
+     
+      if (messagesDiv.innerHTML !== messagesHtml) {
+        messagesDiv.innerHTML = messagesHtml;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const message = input.value.trim();
+     
+      if (!message || !currentChatUser || !currentChatSection) return;
+     
+      const newMessage = {
+        id: 'm' + Date.now(),
+        senderId: currentUser.id,
+        receiverId: currentChatUser.id,
+        section: currentChatSection,
+        message: message,
+        timestamp: Date.now()
+      };
+     
+      appData.messages.push(newMessage);
+      saveData(appData);
+     
+      input.value = '';
+      loadMessages();
+    }
+
+    // ===================== PROFILE =====================
+    function loadProfile() {
+      if (!currentUser) return;
+     
+      // Refresh user data
+      currentUser = appData.users.find(u => u.id === currentUser.id);
+     
+      document.getElementById('profile-avatar').src = currentUser.profilePic;
+      document.getElementById('profile-name').textContent = currentUser.name;
+      document.getElementById('profile-student-id').textContent = currentUser.studentId;
+      document.getElementById('profile-bio').value = currentUser.bio || '';
+      document.getElementById('profile-mood').textContent = currentUser.mood || 'Not selected';
+     
+      const interestsDiv = document.getElementById('profile-interests');
+      if (currentUser.interests && currentUser.interests.length > 0) {
+        interestsDiv.innerHTML = currentUser.interests.map(i =>
+          `<span class="text-sm px-3 py-1 rounded-full" style="background: var(--interest-primary); color: white;">${i}</span>`
+        ).join('');
+      } else {
+        interestsDiv.innerHTML = '<span class="text-gray-500">No interests selected</span>';
+      }
+     
+      document.getElementById('mental-connections-count').textContent =
+        (currentUser.connectionsMental || []).length;
+      document.getElementById('interest-connections-count').textContent =
+        (currentUser.connectionsInterest || []).length;
+    }
+
+    function saveProfile() {
+      const bio = document.getElementById('profile-bio').value.trim();
+     
+      currentUser.bio = bio;
+      const userIndex = appData.users.findIndex(u => u.id === currentUser.id);
+      appData.users[userIndex] = currentUser;
+      saveData(appData);
+     
+      showToast('Profile saved!');
+    }
+
+    // ===================== UTILITIES =====================
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+     
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ===================== INITIALIZATION =====================
+    function init() {
+      // Check for existing session
+      const storedUser = localStorage.getItem('vibesync_current_user');
+      if (storedUser) {
+        currentUser = JSON.parse(storedUser);
+        // Refresh user data from storage
+        const freshUser = appData.users.find(u => u.id === currentUser.id);
+        if (freshUser) {
+          currentUser = freshUser;
+          navigateTo('dashboard');
+          showSection('mental');
+        } else {
+          localStorage.removeItem('vibesync_current_user');
+          navigateTo('landing');
+        }
+      } else {
+        navigateTo('landing');
+      }
+    }
+
+    // Update notification badge periodically
+    setInterval(() => {
+      if (currentUser) {
+        updateNotificationBadge();
+      }
+    }, 3000);
+
+    // Start app
+    init();
+  </script>
+</body>
+</html>
